@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--设置注解扫描范围-->
+    <context:component-scan base-package="com.xuhai.bookshop"/>
+    <!--开启SpringMVC的注解功能-->
+    <mvc:annotation-driven/>
+    <!--引入数据库配置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!--设置初始化时自动创建链接的个数-->
+        <property name="initialSize" value="1"/>
+        <!--设置最小连接数-->
+        <property name="minIdle" value="1"/>
+        <!--设置最大连接数-->
+        <property name="maxActive" value="20"/>
+    </bean>
+    <!--配置Mybatis工厂-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <!--加载数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置实体类的别名-->
+        <property name="typeAliasesPackage" value="com.xuhai.bookshop.bean"/>
+        <!--加载mybatis的配置文件，实现驼峰命名的自动匹配-->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <!--配置分页工具插件-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageHelper">
+                    <property name="properties">
+                        <value>dialect=mysql</value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+    <!--配置Mapper接口管理器-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--指定mapper文件的包路径-->
+        <property name="basePackage" value="com.xuhai.bookshop.mapper"/>
+    </bean>
+    <!--配置Spring的事务管理器-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <!--加载数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--开启事物管理注解-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!--配置JSON处理器-->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <!--配置spring自带解析器-->
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+            <!--配置fastjson解析器-->
+            <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=utf-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+
+    <!--配置文件上传解析器,这个组件的id名称必须叫做multipartResolver，不能不写，也不能更改！！！-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8"/>
+        <property name="maxUploadSize" value="5200000"/>
+    </bean>
+
+    <!--解决跨域-->
+    <mvc:cors>
+        <mvc:mapping path="/**" allowed-origins="*" allowed-methods="GET,POST,DELETE"/>
+    </mvc:cors>
+
+    <!--验证码配置-->
+    <bean id="kaptcha" class="com.google.code.kaptcha.impl.DefaultKaptcha">
+        <property name="config">
+            <bean class="com.google.code.kaptcha.util.Config">
+                <constructor-arg>
+                    <props>
+                        <!--随机字符串的长和宽-->
+                        <prop key="kaptcha.image.width">100</prop>
+                        <prop key="kaptcha.image.height">50</prop>
+                        <prop key="kaptcha.noise.impl">com.google.code.kaptcha.impl.NoNoise</prop>
+                        <!--字符串的长度-->
+                        <prop key="kaptcha.textproducer.char.length">4</prop>
+                        <!--验证码的内容选择-->
+                        <prop key="kaptcha.textproducer.char.string">
+                            1345678abcdefghjkmnoprstuvwxyABCDEFGHIJKMNOPQRSTUVWXY
+                        </prop>
+                    </props>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+</beans>

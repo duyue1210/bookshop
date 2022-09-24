@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xuhai.bookshop.mapper.BookMapper">
+    <resultMap id="BaseResultMap" type="com.xuhai.bookshop.bean.Book">
+        <id column="book_id" jdbcType="INTEGER" property="bookId" />
+        <result column="book_name" jdbcType="VARCHAR" property="bookName" />
+        <result column="lead" jdbcType="VARCHAR" property="lead" />
+        <result column="release_date" jdbcType="DATE" property="releaseDate" />
+        <result column="profile" jdbcType="VARCHAR" property="profile" />
+        <result column="score" jdbcType="INTEGER" property="score" />
+        <result column="author_id" jdbcType="INTEGER" property="authorId" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <collection property="categoryList" column="book_id" select="com.xuhai.bookshop.mapper.BookCategoryMapper.getCategoryListByBookId"/>
+        <collection property="imageList" column="book_id" select="com.xuhai.bookshop.mapper.BookImageMapper.getImageListByBookId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        book_id, book_name, lead, release_date, profile, score, author_id, status
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from book
+        where book_id = #{bookId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from book
+        where book_id = #{bookId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.xuhai.bookshop.bean.Book">
+        insert into book (book_id, book_name, lead,
+                          release_date, profile, score,
+                          author_id, status)
+        values (#{bookId,jdbcType=INTEGER}, #{bookName,jdbcType=VARCHAR}, #{lead,jdbcType=VARCHAR},
+                #{releaseDate,jdbcType=DATE}, #{profile,jdbcType=VARCHAR}, #{score,jdbcType=INTEGER},
+                #{authorId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" keyProperty="bookId" useGeneratedKeys="true" parameterType="com.xuhai.bookshop.bean.Book">
+        insert into book
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">
+                book_id,
+            </if>
+            <if test="bookName != null">
+                book_name,
+            </if>
+            <if test="lead != null">
+                lead,
+            </if>
+            <if test="releaseDate != null">
+                release_date,
+            </if>
+            <if test="profile != null">
+                profile,
+            </if>
+            <if test="score != null">
+                score,
+            </if>
+            <if test="authorId != null">
+                author_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">
+                #{bookId,jdbcType=INTEGER},
+            </if>
+            <if test="bookName != null">
+                #{bookName,jdbcType=VARCHAR},
+            </if>
+            <if test="lead != null">
+                #{lead,jdbcType=VARCHAR},
+            </if>
+            <if test="releaseDate != null">
+                #{releaseDate,jdbcType=DATE},
+            </if>
+            <if test="profile != null">
+                #{profile,jdbcType=VARCHAR},
+            </if>
+            <if test="score != null">
+                #{score,jdbcType=INTEGER},
+            </if>
+            <if test="authorId != null">
+                #{authorId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.xuhai.bookshop.bean.Book">
+        update book
+        <set>
+            <if test="bookName != null">
+                book_name = #{bookName,jdbcType=VARCHAR},
+            </if>
+            <if test="lead != null">
+                lead = #{lead,jdbcType=VARCHAR},
+            </if>
+            <if test="releaseDate != null">
+                release_date = #{releaseDate,jdbcType=DATE},
+            </if>
+            <if test="profile != null">
+                profile = #{profile,jdbcType=VARCHAR},
+            </if>
+            <if test="score != null">
+                score = #{score,jdbcType=INTEGER},
+            </if>
+            <if test="authorId != null">
+                author_id = #{authorId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+        </set>
+        where book_id = #{bookId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.xuhai.bookshop.bean.Book">
+        update book
+        set book_name = #{bookName,jdbcType=VARCHAR},
+            lead = #{lead,jdbcType=VARCHAR},
+            release_date = #{releaseDate,jdbcType=DATE},
+            profile = #{profile,jdbcType=VARCHAR},
+            score = #{score,jdbcType=INTEGER},
+            author_id = #{authorId,jdbcType=INTEGER},
+            status = #{status,jdbcType=INTEGER}
+        where book_id = #{bookId,jdbcType=INTEGER}
+    </update>
+
+    <select id="getAll" parameterType="com.xuhai.bookshop.bean.Book" resultMap="BaseResultMap">
+        select * from book
+        <where>
+            <if test="bookName != null and bookName != ''">
+                and book_name like concat('%',#{bookName},'%')
+            </if>
+            <if test="authorId != null">
+                and author_id = #{authorId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="rangeScore != null and rangeScore.length > 0">
+                and score between ${rangeScore[0]} and ${rangeScore[1]}
+            </if>
+            <if test="rangeRelease != null and rangeRelease.length >0">
+                and release_date between '${rangeRelease[0]}' and '${rangeRelease[1]}'
+            </if>
+        </where>
+        order by book_id desc
+    </select>
+</mapper>

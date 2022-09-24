@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xuhai.bookshop.mapper.AuthorMapper">
+    <resultMap id="BaseResultMap" type="com.xuhai.bookshop.bean.Author">
+        <id column="author_id" jdbcType="INTEGER" property="authorId" />
+        <result column="author_name" jdbcType="VARCHAR" property="authorName" />
+        <result column="profile" jdbcType="VARCHAR" property="profile" />
+        <result column="photo" jdbcType="VARCHAR" property="photo" />
+        <result column="sex" jdbcType="INTEGER" property="sex" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        author_id, author_name, profile, photo, sex, status
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from author
+        where author_id = #{authorId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from author
+        where author_id = #{authorId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.xuhai.bookshop.bean.Author">
+        insert into author (author_id, author_name, profile,
+                            photo, sex, status)
+        values (#{authorId,jdbcType=INTEGER}, #{authorName,jdbcType=VARCHAR}, #{profile,jdbcType=VARCHAR},
+                #{photo,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, #{status,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.xuhai.bookshop.bean.Author">
+        insert into author
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="authorId != null">
+                author_id,
+            </if>
+            <if test="authorName != null">
+                author_name,
+            </if>
+            <if test="profile != null">
+                profile,
+            </if>
+            <if test="photo != null">
+                photo,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="authorId != null">
+                #{authorId,jdbcType=INTEGER},
+            </if>
+            <if test="authorName != null">
+                #{authorName,jdbcType=VARCHAR},
+            </if>
+            <if test="profile != null">
+                #{profile,jdbcType=VARCHAR},
+            </if>
+            <if test="photo != null">
+                #{photo,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.xuhai.bookshop.bean.Author">
+        update author
+        <set>
+            <if test="authorName != null">
+                author_name = #{authorName,jdbcType=VARCHAR},
+            </if>
+            <if test="profile != null">
+                profile = #{profile,jdbcType=VARCHAR},
+            </if>
+            <if test="photo != null">
+                photo = #{photo,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+        </set>
+        where author_id = #{authorId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.xuhai.bookshop.bean.Author">
+        update author
+        set author_name = #{authorName,jdbcType=VARCHAR},
+            profile = #{profile,jdbcType=VARCHAR},
+            photo = #{photo,jdbcType=VARCHAR},
+            sex = #{sex,jdbcType=INTEGER},
+            status = #{status,jdbcType=INTEGER}
+        where author_id = #{authorId,jdbcType=INTEGER}
+    </update>
+
+    <select id="getAll" parameterType="com.xuhai.bookshop.bean.Author" resultMap="BaseResultMap">
+        select * from author
+        <where>
+            <if test="authorName != '' and authorName != null">
+                and author_name like concat('%',#{authorName},'%')
+            </if>
+            <if test="sex != null">
+                and sex = #{sex}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by author_id desc
+    </select>
+</mapper>

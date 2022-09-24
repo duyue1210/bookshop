@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xuhai.bookshop.mapper.CodeMapper">
+    <resultMap id="BaseResultMap" type="com.xuhai.bookshop.bean.Code">
+        <id column="uuid" jdbcType="VARCHAR" property="uuid" />
+        <result column="code" jdbcType="VARCHAR" property="code" />
+        <result column="expires" jdbcType="TIMESTAMP" property="expires" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        uuid, code, expires
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from code
+        where uuid = #{uuid,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from code
+        where uuid = #{uuid,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.xuhai.bookshop.bean.Code">
+        insert into code (uuid, code, expires
+        )
+        values (#{uuid,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{expires,jdbcType=TIMESTAMP}
+               )
+    </insert>
+    <insert id="insertSelective" parameterType="com.xuhai.bookshop.bean.Code">
+        insert into code
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uuid != null">
+                uuid,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="expires != null">
+                expires,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uuid != null">
+                #{uuid,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="expires != null">
+                #{expires,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.xuhai.bookshop.bean.Code">
+        update code
+        <set>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="expires != null">
+                expires = #{expires,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where uuid = #{uuid,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.xuhai.bookshop.bean.Code">
+        update code
+        set code = #{code,jdbcType=VARCHAR},
+            expires = #{expires,jdbcType=TIMESTAMP}
+        where uuid = #{uuid,jdbcType=VARCHAR}
+    </update>
+    <select id="getAll" parameterType="com.xuhai.bookshop.bean.Category" resultMap="BaseResultMap">
+        select * from category
+        <where>
+            <if test="categoryName != '' and categoryName != null">
+                and category_name like concat('%',#{categoryName},'%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by category_id desc
+    </select>
+</mapper>
